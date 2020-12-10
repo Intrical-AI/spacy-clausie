@@ -102,7 +102,7 @@ class Clause:
             adverbials: typing.List[Span] = None,
     ):
         """
-        
+
 
         Parameters
         ----------
@@ -143,17 +143,17 @@ class Clause:
         has_complement = self.complement is not None
         has_adverbial = len(self.adverbials) > 0
         has_ext_copular_verb = (
-                has_verb and self.verb.root.lemma_ in dictionary["ext_copular"]
+            has_verb and self.verb.root.lemma_ in dictionary["ext_copular"]
         )
         has_non_ext_copular_verb = (
-                has_verb and self.verb.root.lemma_ in dictionary["non_ext_copular"]
+            has_verb and self.verb.root.lemma_ in dictionary["non_ext_copular"]
         )
         conservative = MOD_CONSERVATIVE
         has_direct_object = self.direct_object is not None
         has_indirect_object = self.indirect_object is not None
         has_object = has_direct_object or has_indirect_object
         complex_transitive = (
-                has_verb and self.verb.root.lemma_ in dictionary["complex_transitive"]
+            has_verb and self.verb.root.lemma_ in dictionary["complex_transitive"]
         )
 
         clause_type = "undefined"
@@ -517,12 +517,16 @@ def find_verb_subject(v):
     if v.dep_ in ["nsubj", "nsubjpass", "nsubj:pass"]:
         return v
     elif v.dep_ in ["advcl", "acl"]:
+        if v.head == v:
+            raise ValueError('infinite reucrsion in find_verb_subject')
         return find_verb_subject(v.head)
 
     for c in v.children:
         if c.dep_ in ["nsubj", "nsubjpass", "nsubj:pass"]:
             return c
         elif c.dep_ in ["advcl", "acl"]:
+            if v.head == v:
+                raise ValueError('infinite reucrsion in find_verb_subject')
             return find_verb_subject(v.head)
 
 
